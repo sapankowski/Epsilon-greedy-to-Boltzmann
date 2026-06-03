@@ -1,0 +1,34 @@
+env:
+  env_id: ALE/Breakout-v5
+  atari: true
+  reward_clip: 1.0
+  frame_stack: 4
+  screen_size: 84
+  frame_skip: 4
+  noop_max: 30
+  terminal_on_life_loss: false
+  scale_obs: true
+total_steps: 1000000
+seed: 0
+eval_interval: 50000
+eval_episodes: 5
+log_interval: 10000
+dqn:
+  gamma: 0.99
+  learning_rate: 0.0001
+  batch_size: 32
+  replay_size: 1000000
+  learning_starts: 50000
+  train_every: 4
+  target_update_interval: 10000
+  hidden_sizes: [512]
+exploration:
+  name: annealed_epsilon_boltzmann
+  epsilon_start: 1.0
+  epsilon_end: 0.01
+  epsilon_decay_steps: 500000
+  temperature_start: 3.0
+  temperature_end: 0.2
+  temperature_decay_steps: 500000
+  switch_start_step: 100000
+  switch_end_step: 500000

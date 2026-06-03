@@ -1,0 +1,25 @@
+env:
+  env_id: LunarLander-v3
+total_steps: 300000
+seed: 0
+eval_interval: 10000
+eval_episodes: 10
+log_interval: 2500
+dqn:
+  gamma: 0.99
+  learning_rate: 0.0005
+  batch_size: 128
+  replay_size: 200000
+  learning_starts: 5000
+  target_update_interval: 2000
+  hidden_sizes: [256, 256]
+exploration:
+  name: annealed_epsilon_boltzmann
+  epsilon_start: 1.0
+  epsilon_end: 0.02
+  epsilon_decay_steps: 150000
+  temperature_start: 3.0
+  temperature_end: 0.2
+  temperature_decay_steps: 150000
+  switch_start_step: 25000
+  switch_end_step: 150000

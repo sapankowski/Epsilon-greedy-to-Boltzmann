@@ -1,0 +1,28 @@
+env:
+  env_id: CartPole-v1
+total_steps: 50000
+seed: 0
+eval_interval: 5000
+eval_episodes: 5
+log_interval: 1000
+dqn:
+  gamma: 0.99
+  learning_rate: 0.001
+  batch_size: 64
+  replay_size: 50000
+  learning_starts: 1000
+  target_update_interval: 1000
+  hidden_sizes: [128, 128]
+exploration:
+  name: uncertainty_switch
+  epsilon_start: 1.0
+  epsilon_end: 0.05
+  epsilon_decay_steps: 30000
+  temperature_start: 2.0
+  temperature_end: 0.2
+  temperature_decay_steps: 30000
+  switch_start_step: 5000
+  switch_end_step: 30000
+  low_uncertainty: 0.25
+  high_uncertainty: 0.85
+  uncertainty_temperature: 1.0
