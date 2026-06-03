@@ -23,12 +23,11 @@ dqn:
   target_update_interval: 10000
   hidden_sizes: [512]
 exploration:
-  name: annealed_epsilon_boltzmann
+  name: topk_boltzmann
   epsilon_start: 1.0
   epsilon_end: 0.01
   epsilon_decay_steps: 500000
   temperature_start: 3.0
   temperature_end: 0.2
   temperature_decay_steps: 500000
-  switch_start_step: 100000
-  switch_end_step: 500000
+  top_k: 2

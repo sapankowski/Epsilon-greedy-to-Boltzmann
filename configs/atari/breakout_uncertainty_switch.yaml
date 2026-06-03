@@ -23,7 +23,7 @@ dqn:
   target_update_interval: 10000
   hidden_sizes: [512]
 exploration:
-  name: annealed_epsilon_boltzmann
+  name: uncertainty_switch
   epsilon_start: 1.0
   epsilon_end: 0.01
   epsilon_decay_steps: 500000
@@ -32,3 +32,6 @@ exploration:
   temperature_decay_steps: 500000
   switch_start_step: 100000
   switch_end_step: 500000
+  low_uncertainty: 0.25
+  high_uncertainty: 0.85
+  uncertainty_temperature: 1.0
