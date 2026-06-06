@@ -1,0 +1,13 @@
+task_id	config	seed	strategy	run_name	output_dir	total_steps	eval_episodes	checkpoint_interval
+0	configs/atari/breakout_epsilon_greedy.yaml	0	epsilon_greedy	breakout_epsilon_greedy_seed0	runs/breakout_1m	1000000	default	100000
+1	configs/atari/breakout_annealed.yaml	0	annealed_epsilon_boltzmann	breakout_annealed_epsilon_boltzmann_seed0	runs/breakout_1m	1000000	default	100000
+2	configs/atari/breakout_topk_boltzmann.yaml	0	topk_boltzmann	breakout_topk_boltzmann_seed0	runs/breakout_1m	1000000	default	100000
+3	configs/atari/breakout_uncertainty_switch.yaml	0	uncertainty_switch	breakout_uncertainty_switch_seed0	runs/breakout_1m	1000000	default	100000
+4	configs/atari/breakout_epsilon_greedy.yaml	1	epsilon_greedy	breakout_epsilon_greedy_seed1	runs/breakout_1m	1000000	default	100000
+5	configs/atari/breakout_annealed.yaml	1	annealed_epsilon_boltzmann	breakout_annealed_epsilon_boltzmann_seed1	runs/breakout_1m	1000000	default	100000
+6	configs/atari/breakout_topk_boltzmann.yaml	1	topk_boltzmann	breakout_topk_boltzmann_seed1	runs/breakout_1m	1000000	default	100000
+7	configs/atari/breakout_uncertainty_switch.yaml	1	uncertainty_switch	breakout_uncertainty_switch_seed1	runs/breakout_1m	1000000	default	100000
+8	configs/atari/breakout_epsilon_greedy.yaml	2	epsilon_greedy	breakout_epsilon_greedy_seed2	runs/breakout_1m	1000000	default	100000
+9	configs/atari/breakout_annealed.yaml	2	annealed_epsilon_boltzmann	breakout_annealed_epsilon_boltzmann_seed2	runs/breakout_1m	1000000	default	100000
+10	configs/atari/breakout_topk_boltzmann.yaml	2	topk_boltzmann	breakout_topk_boltzmann_seed2	runs/breakout_1m	1000000	default	100000
+11	configs/atari/breakout_uncertainty_switch.yaml	2	uncertainty_switch	breakout_uncertainty_switch_seed2	runs/breakout_1m	1000000	default	100000

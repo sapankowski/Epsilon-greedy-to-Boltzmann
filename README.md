@@ -172,3 +172,5 @@ policy quality.
 For Atari, start with the included Breakout config as a correctness scaffold.
 Atari-scale results require substantially longer runs and more seeds than the toy
 Gymnasium environments.
+
+For cluster execution, see [docs/CLUSTER.md](docs/CLUSTER.md).

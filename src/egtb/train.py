@@ -28,7 +28,7 @@ def choose_device(requested: str) -> torch.device:
     return torch.device(requested)
 
 
-def run_name(config: ExperimentConfig) -> str:
+def default_run_name(config: ExperimentConfig) -> str:
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     env = config.env.env_id.replace("/", "_")
     return f"{timestamp}_{env}_{config.exploration.name}_seed{config.seed}"
@@ -71,10 +71,25 @@ def evaluate(agent: DQNAgent, config: ExperimentConfig, step: int) -> dict[str, 
     }
 
 
-def train(config: ExperimentConfig) -> Path:
+def save_agent_checkpoint(agent: DQNAgent, run_dir: Path, step: int) -> None:
+    checkpoint_dir = run_dir / "checkpoints"
+    checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    torch.save(agent.state_dict(), checkpoint_dir / f"agent_step_{step}.pt")
+
+
+def train(
+    config: ExperimentConfig,
+    *,
+    run_name_override: str | None = None,
+    skip_existing: bool = False,
+    checkpoint_interval: int = 0,
+) -> Path:
     seed_everything(config.seed)
     device = choose_device(config.device)
-    run_dir = Path(config.output_dir) / run_name(config)
+    run_dir = Path(config.output_dir) / (run_name_override or default_run_name(config))
+    if skip_existing and (run_dir / "summary.json").exists():
+        print(f"skipping completed run: {run_dir}")
+        return run_dir
     run_dir.mkdir(parents=True, exist_ok=True)
     save_config(config, run_dir / "config.yaml")
 
@@ -180,6 +195,9 @@ def train(config: ExperimentConfig) -> Path:
                     )
                 )
 
+            if checkpoint_interval > 0 and (step + 1) % checkpoint_interval == 0:
+                save_agent_checkpoint(agent, run_dir, step + 1)
+
         final_eval = evaluate(agent, config, config.total_steps)
         eval_logger.write(final_eval)
         torch.save(agent.state_dict(), run_dir / "agent.pt")
@@ -223,6 +241,23 @@ def parse_args() -> argparse.Namespace:
         help="Replay warmup steps before optimization.",
     )
     parser.add_argument("--batch-size", type=int, default=None, help="DQN batch size.")
+    parser.add_argument(
+        "--run-name",
+        type=str,
+        default=None,
+        help="Stable output subdirectory name. Useful for cluster arrays.",
+    )
+    parser.add_argument(
+        "--skip-existing",
+        action="store_true",
+        help="Skip when run_dir already contains summary.json.",
+    )
+    parser.add_argument(
+        "--checkpoint-interval",
+        type=int,
+        default=0,
+        help="Save lightweight model checkpoints every N environment steps.",
+    )
     parser.add_argument("--atari", action="store_true", help="Enable Atari preprocessing.")
     return parser.parse_args()
 
@@ -244,7 +279,12 @@ def main() -> None:
         "dqn.batch_size": args.batch_size,
         "env.atari": True if args.atari else None,
     }
-    train(apply_overrides(config, overrides))
+    train(
+        apply_overrides(config, overrides),
+        run_name_override=args.run_name,
+        skip_existing=args.skip_existing,
+        checkpoint_interval=args.checkpoint_interval,
+    )
 
 
 if __name__ == "__main__":
