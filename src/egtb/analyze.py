@@ -14,6 +14,13 @@ from typing import Iterable
 
 import numpy as np
 
+DISPLAY_NAMES = {
+    "annealed_epsilon_boltzmann": "annealed",
+    "epsilon_greedy": "epsilon-greedy",
+    "topk_boltzmann": "top-k",
+    "uncertainty_switch": "uncertainty",
+}
+
 
 @dataclass(frozen=True)
 class EvalPoint:
@@ -214,6 +221,7 @@ def plot_learning_curves(
 ) -> None:
     plt = configure_matplotlib(output.parent)
     fig, ax = plt.subplots(figsize=(9, 5))
+    y_upper = 1.0
     for strategy, group in grouped(results).items():
         values_by_step: dict[int, list[float]] = defaultdict(list)
         for result in group:
@@ -224,7 +232,8 @@ def plot_learning_curves(
         stds = np.asarray([pstdev(values_by_step[int(step)]) for step in steps], dtype=np.float64)
         ns = np.asarray([len(values_by_step[int(step)]) for step in steps], dtype=np.float64)
         errors = stds / np.sqrt(ns) if band == "sem" else stds
-        line = ax.plot(steps, means, linewidth=2.2, label=strategy)[0]
+        y_upper = max(y_upper, float(np.max(means + errors)))
+        line = ax.plot(steps, means, linewidth=2.2, label=DISPLAY_NAMES.get(strategy, strategy))[0]
         if band != "none":
             ax.fill_between(
                 steps,
@@ -234,12 +243,27 @@ def plot_learning_curves(
                 alpha=0.16,
                 linewidth=0,
             )
-    ax.axhline(solved_threshold, color="black", linestyle="--", linewidth=1.0, alpha=0.45)
+
+    data_ymax = max(1.0, y_upper * 1.15)
+    if solved_threshold <= data_ymax * 1.25:
+        ax.axhline(solved_threshold, color="black", linestyle="--", linewidth=1.0, alpha=0.45)
+        data_ymax = max(data_ymax, solved_threshold * 1.08)
+    else:
+        ax.text(
+            0.99,
+            0.96,
+            f"solved threshold {solved_threshold:g} is off scale",
+            transform=ax.transAxes,
+            ha="right",
+            va="top",
+            fontsize=9,
+            color="0.35",
+        )
     ax.set_xlabel("environment steps")
     ax.set_ylabel("mean evaluation return")
-    ax.set_ylim(bottom=0)
+    ax.set_ylim(bottom=0, top=data_ymax)
     ax.grid(alpha=0.25)
-    ax.legend(fontsize=8, frameon=False)
+    ax.legend(fontsize=9, frameon=False, loc="upper left")
     fig.tight_layout()
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output, dpi=180)
@@ -262,14 +286,15 @@ def plot_final_returns(results: list[RunResult], output: Path) -> None:
         for offset, (_, value) in zip(offsets, seed_values):
             ax.scatter(index + offset, value, color="black", s=20, alpha=0.72, zorder=3)
     ax.set_xticks(x)
-    ax.set_xticklabels(strategies, rotation=18, ha="right")
+    ax.set_xticklabels([DISPLAY_NAMES.get(strategy, strategy) for strategy in strategies])
     ax.set_ylabel("final evaluation return")
-    ax.set_ylim(bottom=0)
+    y_upper = max([mean_ + std for mean_, std in zip(final_means, final_stds)] + [1.0])
+    ax.set_ylim(bottom=0, top=y_upper * 1.18)
     ax.grid(axis="y", alpha=0.25)
     for bar, value in zip(bars, final_means):
         ax.text(
             bar.get_x() + bar.get_width() / 2.0,
-            bar.get_height() + 8,
+            bar.get_height() + y_upper * 0.03,
             f"{value:.0f}",
             ha="center",
             va="bottom",

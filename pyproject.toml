@@ -18,7 +18,11 @@ dependencies = [
 [project.optional-dependencies]
 classic = ["gymnasium[classic-control]>=1.0"]
 box2d = ["gymnasium[box2d]>=1.0"]
-atari = ["gymnasium[atari,accept-rom-license]>=1.0", "ale-py>=0.10"]
+atari = [
+    "gymnasium[atari,accept-rom-license]>=1.0",
+    "ale-py>=0.10",
+    "opencv-python-headless>=4.8",
+]
 plots = ["matplotlib>=3.8"]
 dev = ["pytest>=8.0", "matplotlib>=3.8"]
 

@@ -18,6 +18,9 @@ pip install --upgrade pip
 pip install -e ".[atari,plots]"
 ```
 
+The Atari extra installs `opencv-python-headless`, which provides the `cv2`
+module required by Gymnasium's Atari preprocessing wrapper.
+
 Check CUDA:
 
 ```bash
