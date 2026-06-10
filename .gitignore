@@ -435,3 +435,30 @@ __pycache__/
 .pytest_cache/
 .venv/
 runs/
+
+# Experiment outputs
+runs/
+logs/
+*.pt
+*.pth
+*.ckpt
+*.npy
+*.npz
+*.mp4
+*.gif
+*.avi
+*.egg-info/
+
+# Local experiment artifacts
+runs/
+logs/
+venv/
+*.pt
+*.pth
+*.ckpt
+*.npy
+*.npz
+*.mp4
+*.gif
+*.avi
+*.egg-info/
