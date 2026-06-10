@@ -1,0 +1,13 @@
+strategy,seed,final_return,best_return,best_step,late_return,auc_return,eval_points,run_dir
+annealed_epsilon_boltzmann,0,14.6,18.4,850000,15.7333,8.8789,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_annealed_seed0
+annealed_epsilon_boltzmann,1,0.0,15.6,600000,9.5333,8.5263,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_annealed_seed1
+annealed_epsilon_boltzmann,2,16.6,20.4,600000,13.8,8.2368,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_annealed_seed2
+epsilon_greedy,0,48.0,48.0,1000000,44.2667,17.5368,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_epsilon_greedy_seed0
+epsilon_greedy,1,48.4,48.4,1000000,38.4667,17.4526,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_epsilon_greedy_seed1
+epsilon_greedy,2,33.4,39.6,950000,37.2667,17.9,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_epsilon_greedy_seed2
+topk_boltzmann,0,30.4,45.6,950000,31.4,12.1368,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_topk_boltzmann_seed0
+topk_boltzmann,1,47.2,47.2,1000000,43.5333,16.1579,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_topk_boltzmann_seed1
+topk_boltzmann,2,35.6,35.6,1000000,29.9333,13.4737,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_topk_boltzmann_seed2
+uncertainty_switch,0,27.6,27.6,1000000,23.2,11.2211,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_uncertainty_switch_seed0
+uncertainty_switch,1,31.6,35.2,950000,29.7333,14.0211,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_uncertainty_switch_seed1
+uncertainty_switch,2,33.0,42.2,850000,35.8,18.3737,20,../Epsilon-greedy-to-Boltzmann-heavy/runs/breakout_1m/breakout_uncertainty_switch_seed2
