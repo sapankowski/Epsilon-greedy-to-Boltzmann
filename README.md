@@ -1,109 +1,171 @@
-# Epsilon-greedy-to-Boltzmann
+# Epsilon-Greedy to Boltzmann Exploration in DQN
 
-This project studies how a DQN agent can move from early epsilon-greedy
-exploration to later Boltzmann exploration when its Q-function becomes more
-informative.
+This repository contains a small, reproducible reinforcement learning framework for studying how a Deep Q-Network agent can transition from **epsilon-greedy exploration** to **Boltzmann exploration** during training.
 
-The implementation is a small, reproducible experiment framework rather than a
-single notebook. It includes a DQN baseline, multiple exploration policies,
-Gymnasium toy-environment configs, an Atari-ready config path, logging, plotting,
-and tests.
+The main idea is simple:
 
-## Why Gymnasium
+> early in training, Q-values are unreliable, so the agent benefits from robust random exploration; later in training, once the Q-function becomes more informative, the agent can use value-based stochastic exploration through a Boltzmann policy.
 
-The original project text mentions OpenAI Gym. Current development has moved to
-[Gymnasium](https://gymnasium.farama.org/), the maintained successor/fork of Gym,
-so the code uses `gymnasium` while keeping the same environment style. Atari
-support uses Gymnasium's ALE integration, which requires Atari ROM installation
-and license acceptance as described in the
-[Gymnasium Atari docs](https://gymnasium.farama.org/environments/atari/).
+The project compares several exploration strategies on classic Gymnasium environments and provides an Atari-ready experimental path.
 
-## Implemented exploration variants
+---
 
-All strategies operate on discrete-action Q-values and can be selected with
-`exploration.name` in YAML or `--strategy` on the CLI.
+## Project goals
 
-| Strategy | Name | Behavior |
-| --- | --- | --- |
+The goal of this project is to investigate whether a DQN agent can benefit from gradually replacing standard epsilon-greedy exploration with Boltzmann-style action sampling.
+
+In standard DQN, epsilon-greedy exploration selects the greedy action most of the time and a random action with probability ε. This is simple and robust, especially early in training. However, it treats all non-greedy actions equally during random exploration.
+
+Boltzmann exploration, on the other hand, samples actions according to a softmax distribution over Q-values. This allows the agent to prefer actions that currently look better while still maintaining stochasticity. The downside is that it depends strongly on the scale and reliability of Q-values.
+
+This repository explores hybrid strategies that try to combine the strengths of both methods.
+
+---
+
+## Implemented exploration strategies
+
+The project implements several discrete-action exploration policies:
+
+| Strategy | Name in config | Description |
+|---|---|---|
 | Epsilon-greedy | `epsilon_greedy` | Standard DQN baseline with a linear epsilon schedule. |
-| Boltzmann | `boltzmann` | Samples all actions with a softmax over Q-values and a temperature schedule. |
-| Annealed switch | `annealed_epsilon_boltzmann` | Smoothly mixes epsilon-greedy into Boltzmann between configured switch steps. |
-| Top-k Boltzmann | `topk_boltzmann` | Uses epsilon random exploration, then samples only among the top-k Q actions. |
-| Uncertainty-aware switch | `uncertainty_switch` | Switches toward Boltzmann only when the temporal schedule has progressed and normalized Q-value entropy is low. |
+| Boltzmann | `boltzmann` | Samples actions from a softmax distribution over Q-values. |
+| Annealed epsilon-to-Boltzmann | `annealed_epsilon_boltzmann` | Smoothly transitions from epsilon-greedy to Boltzmann exploration. |
+| Top-k Boltzmann | `topk_boltzmann` | Uses epsilon exploration and then samples only among the top-k Q-value actions. |
+| Uncertainty-aware switch | `uncertainty_switch` | Switches toward Boltzmann exploration when the schedule has progressed and Q-value entropy is low. |
+
+The main experimental comparison is between these exploration rules while keeping the DQN training pipeline fixed.
+
+---
 
 ## DQN features
 
-- Replay buffer with vectorized random sampling.
-- Target network with hard updates, plus optional soft updates via `tau`.
-- Double-DQN target selection enabled by default.
-- Huber loss and gradient clipping.
-- MLP Q-network for vector observations.
-- Nature-DQN-style CNN for image observations, used by Atari configs.
-- Correct handling of Gymnasium `terminated` vs `truncated`: time-limit truncation resets the episode but does not block bootstrapping.
+The implementation includes a standard DQN training setup with several practical improvements:
 
-## Setup
+- replay buffer with random mini-batch sampling,
+- target Q-network,
+- optional soft target updates,
+- Double DQN target selection,
+- Huber loss,
+- gradient clipping,
+- MLP Q-network for vector observations,
+- CNN Q-network for image observations,
+- support for Gymnasium environments,
+- correct distinction between `terminated` and `truncated` transitions,
+- CSV logging,
+- periodic evaluation,
+- checkpoint saving,
+- plotting and multi-run analysis utilities.
+
+---
+
+## Repository structure
+
+```text
+.
+├── configs/                # YAML experiment configurations
+│   ├── cartpole/           # CartPole experiments
+│   ├── lunarlander/        # LunarLander experiments
+│   └── atari/              # Atari / Breakout configuration path
+│
+├── src/egtb/               # Main Python package
+│   ├── agents/             # DQN agent components
+│   ├── exploration/        # Exploration strategies
+│   ├── networks/           # MLP and CNN Q-networks
+│   ├── replay/             # Replay buffer
+│   ├── training/           # Training loop
+│   └── analysis/           # Plotting and result aggregation
+│
+├── figures/                # Example result plots
+├── tests/                  # Unit and smoke tests
+├── docs/                   # Additional documentation
+├── cluster_manifests/      # Cluster-related execution files
+├── scripts/                # Utility scripts
+├── pyproject.toml          # Project metadata and dependencies
+└── README.md
+```
+
+---
+
+## Installation
+
+Create and activate a virtual environment:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
+```
+
+Install the project in editable mode:
+
+```bash
 pip install -e ".[classic,dev,plots]"
 ```
 
-For LunarLander:
+For LunarLander experiments, install Box2D dependencies:
 
 ```bash
 pip install -e ".[box2d]"
 ```
 
-For Atari:
+For Atari experiments:
 
 ```bash
 pip install -e ".[atari,plots]"
 ```
 
-Atari ROMs require accepting the ROM license. The `accept-rom-license` extra
-installs the helper tooling used by Gymnasium/ALE.
+Atari environments require ROM installation and license acceptance through Gymnasium/ALE tooling.
 
-## Run experiments
+---
 
-CartPole baseline:
+## Running experiments
+
+### CartPole
+
+Run the epsilon-greedy baseline:
 
 ```bash
 egtb-train --config configs/cartpole/epsilon_greedy.yaml
 ```
 
-CartPole annealed epsilon-to-Boltzmann:
+Run the annealed epsilon-to-Boltzmann strategy:
 
 ```bash
 egtb-train --config configs/cartpole/annealed_boltzmann.yaml
 ```
 
-CartPole top-k Boltzmann:
+Run top-k Boltzmann exploration:
 
 ```bash
 egtb-train --config configs/cartpole/topk_boltzmann.yaml
 ```
 
-CartPole uncertainty-aware switching:
+Run the uncertainty-aware switching strategy:
 
 ```bash
 egtb-train --config configs/cartpole/uncertainty_switch.yaml
 ```
 
-LunarLander:
+### LunarLander
 
 ```bash
 egtb-train --config configs/lunarlander/annealed_boltzmann.yaml
 egtb-train --config configs/lunarlander/topk_boltzmann.yaml
 ```
 
-Atari scaffold:
+### Atari / Breakout
 
 ```bash
 egtb-train --config configs/atari/breakout_annealed.yaml
 ```
 
-Useful CLI overrides:
+The Atari configuration is intended as a scalable experiment path. Reliable Atari results usually require substantially longer training and more random seeds than the smaller control tasks.
+
+---
+
+## Useful CLI overrides
+
+Configuration values can be overridden from the command line. For example:
 
 ```bash
 egtb-train \
@@ -114,40 +176,86 @@ egtb-train \
   --output-dir runs/cartpole_debug
 ```
 
+This is useful for short debugging runs before launching longer experiments.
+
+---
+
 ## Outputs
 
-Each run writes a timestamped directory under `runs/`:
+Each training run creates a timestamped directory under `runs/`.
 
-- `config.yaml`: exact resolved run configuration.
-- `train.csv`: per-episode return, exploration diagnostics, and latest loss.
-- `eval.csv`: periodic greedy-policy evaluation.
-- `summary.json`: final evaluation and high-level run metadata.
-- `agent.pt`: PyTorch checkpoint.
+A typical run directory contains:
 
-Plot one or more runs:
+```text
+runs/<run-name>/
+├── config.yaml      # Resolved configuration used for the run
+├── train.csv        # Training episode logs
+├── eval.csv         # Periodic evaluation results
+├── summary.json     # Final metrics and metadata
+└── agent.pt         # Saved PyTorch checkpoint
+```
+
+The most important evaluation file is `eval.csv`, because it measures the quality of the learned policy under evaluation conditions. Training returns can be harder to interpret because they are directly affected by the exploration policy.
+
+---
+
+## Plotting and analysis
+
+Plot one or more individual runs:
 
 ```bash
 egtb-plot runs/<run-a> runs/<run-b> --output runs/comparison.png
 ```
 
-Aggregate multi-seed results by strategy:
+Aggregate multiple runs by strategy:
 
 ```bash
 egtb-analyze runs/cartpole_100k --output-dir runs/cartpole_100k_analysis
 ```
 
-This writes grouped learning curves, a final-return plot, and CSV summaries.
+The analysis script produces grouped learning curves, final-return plots, and CSV summaries.
 
-## Tests and smoke run
+---
 
-Run unit tests:
+## Example results
+
+The repository includes example figures comparing the implemented exploration strategies.
+
+### CartPole
+
+CartPole is a fast control task used to validate that the DQN pipeline and exploration policies work correctly.
+
+![CartPole learning curves](figures/cartpole_100k/learning_curves.png)
+
+![CartPole final returns](figures/cartpole_100k/final_returns.png)
+
+### LunarLander
+
+LunarLander is more difficult than CartPole and gives a more informative comparison between exploration strategies.
+
+![LunarLander learning curves](figures/lunarlander_300k/learning_curves.png)
+
+![LunarLander final returns](figures/lunarlander_300k/final_returns.png)
+
+### Breakout
+
+Breakout demonstrates the Atari-ready path with image observations and a convolutional Q-network.
+
+![Breakout learning curves](figures/breakout_3m/learning_curves.png)
+
+![Breakout final returns](figures/breakout_3m/final_returns.png)
+
+---
+
+## Testing
+
+Run the test suite with:
 
 ```bash
 python3 -m pytest
 ```
 
-Short smoke run that exercises environment stepping, replay sampling,
-optimization, checkpointing, and final evaluation:
+A short smoke run can be used to check that environment stepping, replay sampling, optimization, checkpointing, and evaluation work correctly:
 
 ```bash
 egtb-train \
@@ -161,16 +269,47 @@ egtb-train \
   --output-dir runs/smoke
 ```
 
-## Suggested study protocol
+---
 
-Use the CartPole configs first to validate code changes quickly. Then run
-LunarLander with at least three seeds per strategy. Compare `eval.csv` curves
-and final returns, not just training episode returns, because exploration policy
-changes can affect data collection without directly representing the greedy
-policy quality.
+## Suggested experimental protocol
 
-For Atari, start with the included Breakout config as a correctness scaffold.
-Atari-scale results require substantially longer runs and more seeds than the toy
-Gymnasium environments.
+Our experimental workflow is:
 
-For cluster execution, see [docs/CLUSTER.md](docs/CLUSTER.md).
+1. Start with CartPole to validate implementation changes quickly.
+2. Run each exploration strategy with several random seeds.
+3. Compare evaluation curves, not only training returns.
+4. Move to LunarLander for a more demanding low-dimensional benchmark.
+5. Use the Atari configuration only after the smaller environments are stable.
+
+For fair comparison, all strategies are to be evaluated under the same total training steps, seeds, network architecture, optimizer settings, and evaluation protocol.
+
+---
+
+## Interpretation
+
+The experiments are designed to test the following hypothesis:
+
+> epsilon-greedy exploration is safer early in training, while Boltzmann exploration can become more useful later, once Q-values contain meaningful action preferences.
+
+The annealed and uncertainty-aware strategies implement this hypothesis directly. They avoid relying too strongly on Q-values at the beginning of training, while allowing the policy to become more value-sensitive later.
+
+However, Boltzmann exploration is sensitive to Q-value scale and temperature scheduling. This means that performance depends not only on the exploration rule itself, but also on the stability and calibration of the learned Q-function.
+
+---
+
+## References
+
+This project is based on standard ideas from value-based deep reinforcement learning:
+
+- Mnih et al., *Human-level control through deep reinforcement learning*, Nature, 2015.
+- van Hasselt, Guez, and Silver, *Deep Reinforcement Learning with Double Q-learning*, AAAI, 2016.
+- Sutton and Barto, *Reinforcement Learning: An Introduction*, 2nd edition, 2018.
+
+---
+
+
+---
+
+## Author
+
+Stanisław Pańkowski, Filip Baciak
