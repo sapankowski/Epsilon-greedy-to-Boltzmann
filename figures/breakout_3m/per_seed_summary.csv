@@ -1,0 +1,13 @@
+strategy,seed,final_return,best_return,best_step,late_return,auc_return,eval_points,run_dir
+annealed_epsilon_boltzmann,0,15.0,24.8,2000000,17.8667,13.7542,60,runs/breakout_3m/breakout_annealed_seed0
+annealed_epsilon_boltzmann,1,19.2,25.6,2750000,16.0667,12.4102,60,runs/breakout_3m/breakout_annealed_seed1
+annealed_epsilon_boltzmann,2,9.8,28.0,2850000,13.8667,13.0966,60,runs/breakout_3m/breakout_annealed_seed2
+epsilon_greedy,0,179.6,179.6,3000000,126.3333,56.0102,60,runs/breakout_3m/breakout_epsilon_greedy_seed0
+epsilon_greedy,1,89.0,107.8,2900000,87.0667,40.4356,60,runs/breakout_3m/breakout_epsilon_greedy_seed1
+epsilon_greedy,2,76.0,161.8,2700000,52.0667,49.6305,60,runs/breakout_3m/breakout_epsilon_greedy_seed2
+topk_boltzmann,0,72.6,95.8,2500000,56.7333,42.639,60,runs/breakout_3m/breakout_topk_boltzmann_seed0
+topk_boltzmann,1,63.0,105.8,2950000,84.9333,42.2627,60,runs/breakout_3m/breakout_topk_boltzmann_seed1
+topk_boltzmann,2,40.0,81.8,2650000,49.7333,42.3932,60,runs/breakout_3m/breakout_topk_boltzmann_seed2
+uncertainty_switch,0,68.4,160.8,2900000,124.4,55.1627,60,runs/breakout_3m/breakout_uncertainty_switch_seed0
+uncertainty_switch,1,186.4,186.4,3000000,125.0,53.3864,60,runs/breakout_3m/breakout_uncertainty_switch_seed1
+uncertainty_switch,2,109.4,154.4,2100000,67.5333,48.9475,60,runs/breakout_3m/breakout_uncertainty_switch_seed2

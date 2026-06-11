@@ -1,0 +1,5 @@
+strategy,n,seeds,final_mean,final_std,final_min,final_max,best_mean,best_std,late_mean,late_std,auc_mean,auc_std,final_solved_rate,best_solved_rate
+annealed_epsilon_boltzmann,3,0 1 2,14.6667,3.8448,9.8,19.2,26.1333,1.3597,15.9333,1.6357,13.087,0.5488,0.0,0.0
+epsilon_greedy,3,0 1 2,114.8667,46.08,76.0,179.6,149.7333,30.5288,88.4889,30.3359,48.6921,6.3928,0.0,0.0
+topk_boltzmann,3,0 1 2,58.5333,13.6785,40.0,72.6,94.4667,9.8432,63.8,15.2143,42.4316,0.156,0.0,0.0
+uncertainty_switch,3,0 1 2,121.4,48.9149,68.4,186.4,167.2,13.8256,105.6444,26.9497,52.4989,2.6138,0.0,0.0
